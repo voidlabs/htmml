@@ -1,0 +1,20 @@
+{
+  "name": "htmml",
+  "version": "1.0.0",
+  "description": "HTTML templating language to HTML converter",
+  "main": "src/htmml2html.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/voidlabs/htmml.git"
+  },
+  "author": "Stefano Bagnara",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/voidlabs/htmml/issues"
+  },
+  "homepage": "https://github.com/voidlabs/htmml#readme",
+  "dependencies": {
+    "async": "^2.6.0",
+    "cheerio": "^1.0.0-rc.2"
+  }
+}
