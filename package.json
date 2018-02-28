@@ -1,6 +1,6 @@
 {
   "name": "htmml",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "HTTML templating language to HTML converter",
   "main": "src/htmml2html.js",
   "repository": {
@@ -15,6 +15,6 @@
   "homepage": "https://github.com/voidlabs/htmml#readme",
   "dependencies": {
     "async": "^2.6.0",
-    "cheerio": "^1.0.0-rc.2"
+    "cheerio": "^0.22.0"
   }
 }
