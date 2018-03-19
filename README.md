@@ -7,7 +7,9 @@ HTMML processing does this:
 - Looks for ```<default selector="" attr1="" attr2="">``` tags, run the selector as a CSS/jQuery selector to find matching tags in the HTML and add the other attributes to those tags.
 
 ```
+<template-def>
 <default selector=".right" align="right">
+</template-def>
 <p class="right">hello</p>
 ```
 will be translated to
@@ -22,12 +24,14 @@ It's like CSS inlining, but applied to HTML elements and HTML attributes!
 
 An example, when this template is defined
 ```
+<template-def>
 <template tag="mytemplate">
   <def attr="myattr" selector="table, .myclass" mynewattribute="{{myattr}}" />
   <tmpl>
   	<table><tr><td class="myclass">{{replacedcontent}}</td></tr></table>
   </tmpl>
 </template>
+</template-def>
 ```
 The following code
 ```
@@ -69,6 +73,7 @@ will be translated to
 <p>my content</p>
 <!--[if (ie)]></td></tr></table><!-->
 </tmpl>
+</template>
 ```
 Will be temporarily translated to 
 ```
@@ -80,6 +85,7 @@ Will be temporarily translated to
 <p>my content</p>
 <replacedcc condition="(ie)"><cc-table><cc-tr><cc-td><!-- cc:start --></cc-td></cc-tr></cc-table><!-- cc:end --></replacedcc>
 </tmpl>
+</template>
 ```
 The def rules will be applied on this new "template" and then a reverse process is applied to bring back them to their original "conditional comment" form.
 So the ```<def attr="wrongattr">``` won't be applied, because in the "replaced" form the p is not INSIDE the cc-table because conditional comments do not create nesting levels.
@@ -98,3 +104,7 @@ You see the style have been applied to the table, even if it was in a comment.
 ### Done
 
 The "HTMML" specification is complete. They are 200 lines of code and this matched my templating needs better than existing HTML template language.
+
+### HTMML users
+
+We developed HTMML in order to improve maintenance of our [Mosaico Versafix-1 master template](https://github.com/voidlabs/versafix-template)
