@@ -2,10 +2,8 @@
 
 var path = require('path');
 var console = require('console');
-var async = require('async');
 var fs = require('fs');
 var cheerio = require('cheerio');
-var domutils = require("./domutils.js");
 
 /* funzioni prese da mosaico ma modificate per usare cc:tagoriginale al posto di cc (in modo da poterli stilare) */
 
@@ -43,21 +41,21 @@ var domutils_listAttributes = function (element) {
   return element.attribs;
 };
 
-var domutils_appendStyle = function (element, style) {
-  var curStyle = domutils.getAttribute(element, 'style');
-  if (curStyle === null) curStyle = '';
+var domutils_appendStyle = function (element, style, $) {
+  var curStyle = $(element).attr('style');
+  if (curStyle === undefined) curStyle = '';
   if (curStyle.trim().length > 0 && curStyle.trim().substr(curStyle.trim().length - 1) !== ';') curStyle += '; ';
   if (curStyle.length > 0 && curStyle.substr(curStyle.length - 1) === ';') curStyle += ' ';
   curStyle += style;
-  domutils.setAttribute(element, 'style', curStyle);
+  $(element).attr('style', curStyle);
 };
 
-var domutils_appendClass = function (element, style) {
-  var curClass = domutils.getAttribute(element, 'class');
-  if (curClass === null) curClass = '';
+var domutils_appendClass = function (element, style, $) {
+  var curClass = $(element).attr('class');
+  if (curClass === undefined) curClass = '';
   if (curClass.trim().length > 0 && curClass.trim().substr(curClass.trim().length - 1) !== ' ') curClass += ' ';
   curClass += style;
-  domutils.setAttribute(element, 'class', curClass);
+  $(element).attr('class', curClass);
 };
 
 
@@ -88,14 +86,14 @@ var applyTemplating = function (newTmpl, values) {
 var tagRepeater = function ($, tagName) {
 
   $(tagName).each(function (index, element) {
-    var templContent = domutils.getInnerHtml(element);
+    var templContent = $(element).html();
 
     var attributes = domutils_listAttributes(element);
 
     var maxLength = 0;
     var replaceValues = [];
     for (var attr in attributes) if (attributes.hasOwnProperty(attr)) {
-      var attrValues = domutils.getAttribute(element, attr).split(',');
+      var attrValues = $(element).attr(attr).split(',');
       if (maxLength === 0) maxLength = attrValues.length;
       else if (maxLength != attrValues.length) {
         console.log("Numero valori non uniforme tra gli attributi", element, maxLength, attr);
@@ -111,7 +109,7 @@ var tagRepeater = function ($, tagName) {
       content += applyTemplating(templContent, replaceValues[k]);
     }
 
-    domutils.replaceHtml(element, content);
+    $(element).replaceWith(content);
   });
 
 };
@@ -119,7 +117,7 @@ var tagRepeater = function ($, tagName) {
 var tagReplace = function ($, tagName, template, attributesDef) {
 
   $(tagName).each(function (index, element) {
-    var content = domutils.getInnerHtml(element);
+    var content = $(element).html();
 
     var tmplContent = (typeof template == 'string' ? template : template.join("\r\n"));
     tmplContent = conditional_replace(tmplContent, $);
@@ -141,14 +139,14 @@ var tagReplace = function ($, tagName, template, attributesDef) {
           $(def.selector, tmpl).each(function (idx, el) {
             for (var d in def) if (def.hasOwnProperty(d) && d !== 'selector') {
               if (d == 'style' || d == 'addStyle') {
-                domutils_appendStyle(el, def[d]);
+                domutils_appendStyle(el, def[d], $);
               } else if (d == 'class') {
-                domutils_appendClass(el, def[d]);
+                domutils_appendClass(el, def[d], $);
               } else if (d == 'addAttributeName') {
-                domutils.setAttribute(el, def.addAttributeName, def.addAttributeValue);
+                $(el).attr(def.addAttributeName, def.addAttributeValue);
               } else if (d == 'addAttributeValue') {
               } else {
-                domutils.setAttribute(el, d, def[d]);
+                $(el).attr(d, def[d]);
               }
             }
           });
@@ -162,11 +160,11 @@ var tagReplace = function ($, tagName, template, attributesDef) {
     }
 
 
-    var newTmpl = conditional_restore(domutils.getInnerHtml(tmpl[0]));
+    var newTmpl = conditional_restore($(tmpl[0]).html());
 
     newTmpl = applyTemplating(newTmpl, values);
 
-    domutils.replaceHtml(element, newTmpl);
+    $(element).replaceWith(newTmpl);
   });
 
 };
@@ -183,6 +181,7 @@ var translateMetaTemplate = function (input, output) {
     decodeEntities: false,
     recognizeSelfClosing: false,
     lowerCaseTags: false,
+    _useHtmlParser2: true,
   });
 
   // inlining
@@ -193,8 +192,8 @@ var translateMetaTemplate = function (input, output) {
 
     $(sel).each(function (id, elem) {
       for (var attrib in attributes) if (attributes.hasOwnProperty(attrib)) {
-        if (domutils.getAttribute(elem, attrib) === null) {
-          domutils.setAttribute(elem, attrib, attributes[attrib]);
+        if ($(elem).attr(attrib) === undefined) {
+          $(elem).attr(attrib, attributes[attrib]);
         }
       }
     });
@@ -206,7 +205,7 @@ var translateMetaTemplate = function (input, output) {
   $('template-def').each(function (idx1, el1) {
     $('template', el1).each(function (idx, el) {
       var def = {};
-      var tagName = domutils.getAttribute(el, 'tag');
+      var tagName = $(el).attr('tag');
 
       $('def', el).each(function (id, e) {
         var attributes = domutils_listAttributes(e);
