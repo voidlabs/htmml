@@ -182,6 +182,8 @@ var translateMetaTemplate = function (input, output) {
     recognizeSelfClosing: false,
     lowerCaseTags: false,
     _useHtmlParser2: true,
+    // use attr="" instead of attr for empty attr (to stay consistent with previous cheerio releases)
+    emptyAttrs: true,
   });
 
   // inlining
