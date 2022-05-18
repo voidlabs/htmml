@@ -1,6 +1,6 @@
 {
   "name": "htmml",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "HTTML templating language to HTML converter",
   "main": "src/htmml2html.js",
   "repository": {
